@@ -66,3 +66,8 @@ Or visit http://localhost:8000/docs in your browser to see the interactive API d
 ```bash
 deactivate
 ```
+
+## API Documentation
+
+For the complete API contract including the Task model, validation rules, error response format, and REST endpoints, see the [API Contract section in the main README](../README.md#15-data-modelapi-contract).
+
