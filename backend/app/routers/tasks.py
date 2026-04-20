@@ -23,6 +23,22 @@ def list_tasks(db: Session = Depends(get_db)):
     return tasks
 
 
+@router.get("/{task_id}", response_model=TaskResponse)
+def get_task(task_id: str, db: Session = Depends(get_db)):
+    """
+    Get a specific task by ID
+    
+    Returns the task details for the given task ID.
+    """
+    db_task = task_crud.get_task(db, task_id)
+    if not db_task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id {task_id} not found"
+        )
+    return db_task
+
+
 @router.post("/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     """
