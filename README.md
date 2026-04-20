@@ -125,10 +125,21 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - Implemented SQLite persistence and added a Task data model to support stored tasks across sessions.
 - Added backend CRUD endpoints for tasks (create/list/update/delete) and verified behaviour using FastAPI interactive docs.
 - Captured evidence for documentation (FastAPI `/docs` screenshot showing task endpoints) and updated build log
+- Added settings endpoints to get and put wip limit settings and defined associated model
+- Added a test harness and simple test to setup for tdd work
 
 ## 5. Pull requests and workflow evidence
+- [PR #15: chore: day 1 scaffold backend/frontend and README](https://github.com/asaaumar/wip-planner/pull/15)
+- [PR #19: feature: add SQLite persistence and task model](https://github.com/asaaumar/wip-planner/pull/19)
+- [PR #20: feature: implement task CRUD endpoints](https://github.com/asaaumar/wip-planner/pull/20)
+- [PR #21: Feature: added get specific task endpoint](https://github.com/asaaumar/wip-planner/pull/21)
+- [PR #23: feature: add settings endpoints for WIP limit](https://github.com/asaaumar/wip-planner/pull/23)
+- [PR #24: test: add pytest scaffold and health endpoint test](https://github.com/asaaumar/wip-planner/pull/24)
 ## 6. UI implementation notes
 ## 7. Testing + accessibility evidence
+
+- Pytest scaffold added: health check and init tests passing.
+
 ## 8. TDD example
 ## 9. CI/CD + production deployment (Kubernetes)
 ## 10. User guide + technical documentation
