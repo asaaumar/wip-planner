@@ -8,12 +8,16 @@ from datetime import datetime
 
 from app.db.session import engine, Base
 from app.models import task  # Import models to register them with Base
+from app.routers import tasks
 
 app = FastAPI(
     title="WIP Planner API",
     description="Backend API for WIP Planner - A Kanban board with enforced Work-In-Progress limits",
     version="0.1.0"
 )
+
+# Include routers
+app.include_router(tasks.router)
 
 
 @app.on_event("startup")
