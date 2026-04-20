@@ -105,6 +105,27 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 ## 2. UX prototype (Figma)
 ## 3. Project planning (Kanban board + tickets)
 ## 4. MVP implementation overview
+
+### Build log
+
+#### Day 1 (Setup & scaffolding)**
+- Created repository structure for `backend/`, `frontend/`, `docs/`, `k8s/`.
+- Bootstrapped the backend with a FastAPI skeleton and a `/health` endpoint for smoke-checking the API.
+- Bootstrapped the frontend using a vanilla JavaScript template to establish the UI build.
+- Added the README structure aligned to the assessment deliverables and documented the MVP statement.
+- Set up the GitHub Project board (Kanban) and created initial issues/milestones to track MVP, testing, CI/CD, and deployment work.
+
+#### Day 2 (Proposal, UX prototype, and API contract)**
+- Documented the product proposal (problem, target users, MVP features, and non-goals) in the root README.
+- Created a clickable UX prototype (Figma) covering the main screens: board, create/edit task, settings (WIP limit), and error state.
+- Defined the MVP API contract (tasks + settings endpoints) including the expected WIP limit error response (409 conflict with a clear message).
+- Added UX screenshots to `docs/screenshots/` and a UX video in `docs/videos/` for later use in the README.
+
+#### Day 3 (Backend persistence and CRUD)**
+- Implemented SQLite persistence and added a Task data model to support stored tasks across sessions.
+- Added backend CRUD endpoints for tasks (create/list/update/delete) and verified behaviour using FastAPI interactive docs.
+- Captured evidence for documentation (FastAPI `/docs` screenshot showing task endpoints) and updated build log
+
 ## 5. Pull requests and workflow evidence
 ## 6. UI implementation notes
 ## 7. Testing + accessibility evidence
