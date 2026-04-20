@@ -6,9 +6,10 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from datetime import datetime
 
-from app.db.session import engine, Base
-from app.models import task  # Import models to register them with Base
-from app.routers import tasks
+from app.db.session import engine, Base, SessionLocal
+from app.models import task, settings  # Import models to register them with Base
+from app.models.settings import Settings
+from app.routers import tasks, settings
 
 app = FastAPI(
     title="WIP Planner API",
@@ -18,6 +19,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(tasks.router)
+app.include_router(settings.router)
 
 
 @app.on_event("startup")
@@ -29,7 +31,21 @@ async def startup_event():
     # Create all tables defined in models
     Base.metadata.create_all(bind=engine)
     
-    print("Database tables created successfully")
+    # Initialize settings table with default values if it doesn't exist
+    db = SessionLocal()
+    try:
+        existing_settings = db.query(Settings).filter(Settings.id == 1).first()
+        if not existing_settings:
+            default_settings = Settings(id=1, wip_limit=1)
+            db.add(default_settings)
+            db.commit()
+            print("Initialized settings with default WIP limit = 1")
+        else:
+            print(f"Settings loaded: WIP limit = {existing_settings.wip_limit}")
+    finally:
+        db.close()
+    
+    print("Database initialized successfully")
 
 
 @app.on_event("shutdown")
