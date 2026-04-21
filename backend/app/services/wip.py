@@ -14,5 +14,5 @@ def can_move_to_in_progress(in_progress_count: int, wip_limit: int) -> bool:
     Returns:
         True if task can be moved to in-progress, False otherwise
     """
-    return True
+    return in_progress_count < wip_limit
 
