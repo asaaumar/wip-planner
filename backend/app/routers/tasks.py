@@ -3,8 +3,10 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.session import get_db
-from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse
+from app.schemas.task import TaskCreate, TaskUpdate, TaskResponse, TaskStatusUpdate, TaskStatus
 from app.crud import task as task_crud
+from app.crud import settings as settings_crud
+from app.services.wip import can_move_to_in_progress
 
 router = APIRouter(
     prefix="/tasks",
@@ -84,4 +86,54 @@ def delete_task(task_id: str, db: Session = Depends(get_db)):
             detail=f"Task with id {task_id} not found"
         )
     return None
+
+
+@router.patch("/{task_id}/status", response_model=TaskResponse)
+def update_task_status(
+    task_id: str, 
+    status_update: TaskStatusUpdate, 
+    db: Session = Depends(get_db)
+):
+    """
+    Update a task's status with WIP limit enforcement
+    
+    - Moving to IN_PROGRESS: Enforces WIP limit
+    - Moving to TODO or DONE: No WIP check
+    
+    Returns 409 Conflict if WIP limit is reached when moving to IN_PROGRESS.
+    """
+    # Get the task
+    db_task = task_crud.get_task(db, task_id)
+    if not db_task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id {task_id} not found"
+        )
+    
+    new_status = status_update.status
+    
+    # Check WIP limit only when moving to IN_PROGRESS
+    if new_status == TaskStatus.IN_PROGRESS:
+        # Get current WIP limit from settings
+        settings = settings_crud.get_settings(db)
+        wip_limit = settings.wip_limit
+        
+        # Count current in-progress tasks (excluding the current task if it's already in progress)
+        in_progress_count = task_crud.count_in_progress_tasks(db)
+        if db_task.status == TaskStatus.IN_PROGRESS:
+            in_progress_count -= 1  # Don't count the current task
+        
+        # Check if we can move to in-progress
+        if not can_move_to_in_progress(in_progress_count, wip_limit):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": "WIP_LIMIT_REACHED",
+                    "message": "WIP limit reached. Complete a task before starting another."
+                }
+            )
+    
+    # Update the task status
+    updated_task = task_crud.update_task_status(db, task_id, new_status)
+    return updated_task
 

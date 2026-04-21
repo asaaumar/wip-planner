@@ -23,6 +23,11 @@ class TaskUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=2000, description="Task description")
 
 
+class TaskStatusUpdate(BaseModel):
+    """Schema for updating task status"""
+    status: TaskStatus = Field(..., description="New task status")
+
+
 class TaskResponse(BaseModel):
     """Schema for task response"""
     id: str
