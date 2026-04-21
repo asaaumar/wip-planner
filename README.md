@@ -127,7 +127,11 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - Captured evidence for documentation (FastAPI `/docs` screenshot showing task endpoints) and updated build log
 - Added settings endpoints to get and put wip limit settings and defined associated model
 - Added a test harness and simple test to setup for tdd work
-
+ 
+#### Day 4 (WIP with TDD)**
+- Added PATCH status endpoint with WIP enforcement and 409 error
+- Added unit-tested WIP rule via TDD
+  
 ## 5. Pull requests and workflow evidence
 - [PR #15: chore: day 1 scaffold backend/frontend and README](https://github.com/asaaumar/wip-planner/pull/15)
 - [PR #19: feature: add SQLite persistence and task model](https://github.com/asaaumar/wip-planner/pull/19)
@@ -135,6 +139,10 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - [PR #21: Feature: added get specific task endpoint](https://github.com/asaaumar/wip-planner/pull/21)
 - [PR #23: feature: add settings endpoints for WIP limit](https://github.com/asaaumar/wip-planner/pull/23)
 - [PR #24: test: add pytest scaffold and health endpoint test](https://github.com/asaaumar/wip-planner/pull/24)
+- [PR #26: test: add failing tests for WIP rule (TDD), feat: implement WIP rule to satisfy tests](https://github.com/asaaumar/wip-planner/pull/26)
+- [PR #27: test: written tests for checking wip limit when changing status, feature: added patch endpoint to change status, wrote code to pass wip enforcement tests](https://github.com/asaaumar/wip-planner/pull/27)
+
+ ](https://github.com/asaaumar/wip-planner/pull/27)
 ## 6. UI implementation notes
 ## 7. Testing + accessibility evidence
 
