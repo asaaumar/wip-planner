@@ -20,7 +20,7 @@ def create_task(db: Session, task: TaskCreate) -> Task:
     db_task = Task(
         title=task.title,
         description=task.description,
-        status=TaskStatus.TODO  # Default status is TODO (BACKLOG)
+        status=TaskStatus.TODO 
     )
     db.add(db_task)
     db.commit()
@@ -54,4 +54,21 @@ def delete_task(db: Session, task_id: str) -> bool:
     db.delete(db_task)
     db.commit()
     return True
+
+
+def count_in_progress_tasks(db: Session) -> int:
+    """Count tasks with IN_PROGRESS status"""
+    return db.query(Task).filter(Task.status == TaskStatus.IN_PROGRESS).count()
+
+
+def update_task_status(db: Session, task_id: str, new_status: TaskStatus) -> Optional[Task]:
+    """Update a task's status"""
+    db_task = get_task(db, task_id)
+    if not db_task:
+        return None
+    
+    db_task.status = new_status
+    db.commit()
+    db.refresh(db_task)
+    return db_task
 
