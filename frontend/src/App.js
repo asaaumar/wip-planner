@@ -126,6 +126,38 @@ function NewTaskModal({ isOpen, onClose, onCreate }) {
   );
 }
 
+function SettingsModal({ isOpen, onClose, wipLimit, onSave }) {
+  const [limit, setLimit] = useState(wipLimit);
+
+  const handleSave = () => {
+    onSave(limit);
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="modal-header">Settings</div>
+      <div className="modal-body">
+        <label className="form-label">Work-In-Progress Limit</label>
+        <input
+          type="number"
+          className="form-input"
+          value={limit}
+          onChange={(e) => setLimit(parseInt(e.target.value) || 1)}
+          min="1"
+        />
+        <p className="form-help-text">
+          Set the maximum number of tasks allowed in the "In Progress" column.
+        </p>
+      </div>
+      <div className="modal-footer">
+        <button className="btn-primary" onClick={handleSave}>Save Settings</button>
+        <button className="btn-secondary" onClick={onClose}>Close</button>
+      </div>
+    </Modal>
+  );
+}
+
 function TaskCard({ task, onMoveLeft, onMoveRight, onEdit, onDelete }) {
   const canMoveLeft = task.status !== 'todo';
   const canMoveRight = task.status !== 'done';
@@ -196,6 +228,7 @@ function App() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
   // Fetch tasks from API
@@ -326,6 +359,21 @@ function App() {
     }
   };
 
+  const handleSaveSettings = async (newWipLimit) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/settings/`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wip_limit: newWipLimit })
+      });
+      
+      if (!response.ok) throw new Error('Failed to update settings');
+      await fetchSettings();
+    } catch (err) {
+      alert('Error updating settings: ' + err.message);
+    }
+  };
+
   const backlogTasks = tasks.filter(t => t.status === 'todo');
   const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
   const doneTasks = tasks.filter(t => t.status === 'done');
@@ -338,7 +386,7 @@ function App() {
     <div className="App">
       <header className="app-header">
         <h1>WIP Planner</h1>
-        <button className="btn-settings">Settings ▼</button>
+        <button className="btn-settings" onClick={() => setSettingsModalOpen(true)}>Settings ▼</button>
       </header>
 
       {error && <div className="error-banner">Error: {error}</div>}
@@ -394,6 +442,13 @@ function App() {
         isOpen={newTaskModalOpen}
         onClose={() => setNewTaskModalOpen(false)}
         onCreate={handleCreateTask}
+      />
+
+      <SettingsModal
+        isOpen={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+        wipLimit={wipLimit}
+        onSave={handleSaveSettings}
       />
     </div>
   );
