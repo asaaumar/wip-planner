@@ -95,12 +95,17 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 
 #### REST API Endpoints
 
+**Task Endpoints:**
 - `GET /tasks` - List all tasks
 - `POST /tasks` - Create a new task
 - `GET /tasks/{id}` - Get a specific task
 - `PUT /tasks/{id}` - Update a task
 - `DELETE /tasks/{id}` - Delete a task
-- `PATCH /tasks/{id}/status` - Update task status
+- `PATCH /tasks/{id}/status` - Update task status (with WIP limit enforcement)
+
+**Settings Endpoints:**
+- `GET /settings/` - Get current WIP limit settings
+- `PUT /settings/` - Update WIP limit
 
 ## 2. UX prototype (Figma)
 ## 3. Project planning (Kanban board + tickets)
@@ -131,6 +136,12 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 #### Day 4 (WIP with TDD)**
 - Added PATCH status endpoint with WIP enforcement and 409 error
 - Added unit-tested WIP rule via TDD
+
+#### Day 5 (Wed 22 Apr):**
+- Implemented frontend Kanban board UI (3 columns).
+- Connected frontend to backend API (load tasks + create tasks).
+- Added status transition buttons and UI handling for WIP limit errors (409).
+- Added settings to allow users to set WIP limit.
   
 ## 5. Pull requests and workflow evidence
 - [PR #15: chore: day 1 scaffold backend/frontend and README](https://github.com/asaaumar/wip-planner/pull/15)
@@ -140,9 +151,12 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - [PR #23: feature: add settings endpoints for WIP limit](https://github.com/asaaumar/wip-planner/pull/23)
 - [PR #24: test: add pytest scaffold and health endpoint test](https://github.com/asaaumar/wip-planner/pull/24)
 - [PR #26: test: add failing tests for WIP rule (TDD), feat: implement WIP rule to satisfy tests](https://github.com/asaaumar/wip-planner/pull/26)
-- [PR #27: test: written tests for checking wip limit when changing status, feature: added patch endpoint to change status, wrote code to pass wip enforcement tests](https://github.com/asaaumar/wip-planner/pull/27)
+- [PR #27: test: written tests for checking wip limit when changing status, feature: added patch endpoint to change status,wrote code to pass wip enforcement tests](https://github.com/asaaumar/wip-planner/pull/27)
+- [PR #32:f eature: add frontend kanban board layout](https://github.com/asaaumar/wip-planner/pull/32)
+- [PR #33: feature: connect frontend to backend (load and create tasks) with WIP enforcement](https://github.com/asaaumar/wip-planner/pull/33)
+- [PR #35: feature: added settings modal to change WIP](https://github.com/asaaumar/wip-planner/pull/35)
 
- ](https://github.com/asaaumar/wip-planner/pull/27)
+
 ## 6. UI implementation notes
 ## 7. Testing + accessibility evidence
 
