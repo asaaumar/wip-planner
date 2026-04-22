@@ -3,6 +3,7 @@ WIP Planner Backend API
 A FastAPI application for managing Kanban boards with WIP limits.
 """
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from datetime import datetime
 
@@ -15,6 +16,15 @@ app = FastAPI(
     title="WIP Planner API",
     description="Backend API for WIP Planner - A Kanban board with enforced Work-In-Progress limits",
     version="0.1.0"
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include routers
