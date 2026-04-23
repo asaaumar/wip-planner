@@ -5,27 +5,41 @@
 
 ## 1. Product proposal
 
-### 1.1. Problem statement
-  - In short timeboxed delivery environments, work often gets started but not finished, creating high work-in-progress (WIP), context switching, and reduced visibility of true progress.
-  - Too many items in prohress causes bottlenecks.
+### 1.1 Problem statement
+Software delivery teams working in short, timeboxed cycles frequently encounter a predictable pattern: work is started quickly, but completion and validation lag behind. Under delivery pressure, teams may initiate multiple items in parallel to appear responsive, but this can be distracting and increase context switching. From a flow-based perspective, the result is often an accumulation of partially completed work in “in progress” states, while activities that prove completeness such as integration and end-to-end testing are deferred (Anderson, 2010). This creates a false positive of productivity which does not reflect the true completed tickets for the sprint. 
 
-### 1.2. Solution proposal and rationale
-  - Small software delivery teams or individuals working in short cycles (e.g., weekly sprints) who need clearer visibility of progress and stronger flow discipline.
-  - Users who want simple guidance to avoid overloading the “In Progress” column and to finish work before starting new tasks.
-  - Web-based Kanban board with strict wip enforcement to prevent overloading and improve flow.
+High work-in-progress (WIP) is problematic because it hides bottlenecks and makes it harder to identify the true constraint in the system or team. When WIP is unconstrained and unmonitored, delays are not made visible as a  problem as they appear in progress and not blocked. This increases lead times and creates uneven delivery between sprints where tasks remain partially complete across multiple cycles and must be re assessed repeatedly (Anderson, 2010). Agile methods aim to reduce waste and deliver working increments frequently, but these outcomes depend on disciplined work management; without explicit flow controls, teams can inadvertently optimise for starting rather than finishing (Beck et al., 2001). In addition, teams often lack a mechanism to signal when “in progress” is saturated and should not be expanded further-especially in environments where external stakeholders have visibility of wip and there may be a pressure to appear busy.
 
-### 1.3. MVP Scope
-  1. Board with three columns: Backlog, In Progress, Done
-  2. Task management (create, edit, delete) with title and optional description
-  3. Ability to move tasks between columns (status transitions)
-  4. WIP limit enforcement on the “In Progress” column (default limit = 1) with a clear warning/error when exceeded
-  5. Persistence so tasks remain available between sessions (stored and reloaded automatically)
+As mentioned above, this problem is amplified in client-facing or high-accountability contexts where delivery credibility depends not only on activity, but on demonstrable outcomes through playbacks. If work resource is spread too thin or an engineer is aligned to too many tickets due for completion, teams may miss opportunities to  demonstrate value, validate behaviour end-to-end (testing), and produce evidence that a feature is “done” in a meaningful sense in front of a client. Subsequently, stakeholders may request additional proof, rework, or changes late in the cycle, further increasing churn. A lightweight mechanism that improves flow discipline and makes constraints explicit can therefore support both delivery performance and stakeholder confidence.
 
-### 1.4. Non-MVP Scope (Stretch Goals)
-  - Drag-and-drop interaction (button-based movement is sufficient)
-  - User accounts, authentication, or multi-user permissions
-  - Advanced analytics (e.g., cycle time dashboards, forecasting) beyond simple visibility
-  - Integrations with external tools (e.g., Jira/Slack) in the MVP phase
+### 1.2 Solution proposal and rationale
+The proposed solution is a lightweight web-based WIP Planner: a minimal Kanban board that makes work state visible and enforces a Work-In-Progress limit to encourage completion before taking on more tasks. The application provides a three-column workflow (Backlog, In Progress, Done) and prevents users from having too many tickets in the “In Progress” column by enforcing a configurable WIP limit (default = 1). The proposal rationale follows modern Kanban practices: limiting WIP is a central mechanism for stabilising flow, reducing context switching, and surfacing bottlenecks early (Anderson, 2010). Rather than relying on informal self-control.
+
+The design intentionally avoids complexity. Many task management tools similar to the proposed often focus on being feature-rich, but feature depth is not the primary requirement for improving flow and therefore ot the scope for the project. Instead, the WIP Planner focuses on a small set of actions that support the core behavioural change: capturing work clearly, starting only what can be completed (enforced by WIP), and making exceptions visible (ticket in progress for too long). This aligns with the Agile principle of prioritising working, inspectable outcomes and reducing process overhead that does not contribute to value (Beck et al., 2001). The solution also supports clear feedback at the point of action: when a user attempts to move an item into “In Progress” and the WIP limit has been reached, the system provides immediate feedback and blocks the move. This creates a consistent rule set that reduces ambiguity and helps users understand why flow discipline matters in practice.
+
+Additionally, a minimal three-state (columns) workflow drives interpretability; users can quickly understand the meaning of each state/column and the expectations attached to it. This is particularly useful in short-cycle delivery (such as daily or weekly sprints) where teams need a common model of “what is happening” without investing time in maintaining process artefacts and admin. The proposal therefore prioritises usability and clarity over sophistication, while still providing enough structure to demonstrate professional advanced software engineering practice in implementation, testing, CI/CD, deployment and documentation.
+
+### 1.3 Target users and value proposition
+The primary target users for the project are small software delivery teams (or individuals) operating in short cycles (weekly or daily sprints) who need clearer visibility of progress and a simple way of preventing over burdoning engineers. A key point of note is that the value proposition is not that the tool replaces established enterprise platforms (such as monday.com), but that it provides an intentionally constrained workflow to reinforce good flow habits and can be used as an informal tracker/training tool. For teams, the tool offers: improved transparency of work state reduced hidden work caused by excessive parallelism (such as integration testing) and a clearer pathway to producing demonstrable increments with completed tickets tracked in "Done". For individuals, the tool acts as a self-management/training aid which enforces behaviour that aligns with the mentality that finishing tasks is often more valuable than starting additional ones (team culture).
+
+The educational value of the tool is that it is designed to make flow concepts digestible. By enforcing a WIP limit and presenting clear feedback, it helps users connect abstract ideas such as WIP, bottleneck and throughput to behaviour. This provides a strong basis for evaluating whether WIP limits improve completion within time constraints and how different limits can affext sprint deliverables.
+
+### 1.4 MVP scope
+The MVP is deliberately scoped to address the issues in the problem statement while remaining deliverable within the assessment timeline.
+
+1. A three-column board: Backlog, In Progress, Done
+2. Task management: create, edit, delete tasks (title required; description optional)
+3. Status transitions between columns (button-based movement)
+4. WIP limit enforcement on “In Progress” (default limit = 1) with clear error feedback when exceeded
+5. Persistence so tasks remain available between sessions (stored and reloaded automatically)
+
+### 1.5 Non-MVP scope (stretch goals)
+To prevent scope creep, the following features are explicitly out of scope for the MVP:
+- Drag-and-drop interactions (buttons are sufficient and reduce accessibility risk)
+- Authentication, user accounts, and multi-user permissions
+- Advanced analytics (cycle time dashboards, forecasting)
+- Integrations with external platforms (e.g., Jira/Slack)
+- Complex workflow configurations beyond three core states
 
 ### 1.5. Data Model/API Contract
 The core data model for functionality in the WIP Planner is as follows:
@@ -108,6 +122,7 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - `PUT /settings/` - Update WIP limit
 
 ## 2. UX prototype (Figma)
+
 ## 3. Project planning (Kanban board + tickets)
 ## 4. MVP implementation overview
 
@@ -168,3 +183,7 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 
 ## How to run locally
 ## Deployment
+
+## References
+- Anderson, D.J. (2010) *Kanban: Successful evolutionary change for your technology business*. Sequim, WA: Blue Hole Press.  
+- Beck, K. et al. (2001) *Manifesto for Agile Software Development*. Available at: https://agilemanifesto.org/
