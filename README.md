@@ -122,7 +122,43 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - `PUT /settings/` - Update WIP limit
 
 ## 2. UX prototype (Figma)
+## 2. UX prototype (Figma)
 
+The UX prototype was designed to validate the core interaction model of the WIP Planner and is designed to allow users users to be able to: View work state through a single pane of glass, create and maintain tasks with minimal friction and effort and receive immediate, understandable feedback when attempting to exceed the Work-In-Progress (WIP) limit in line with the mvp scope and problem statement. The design uses a single primary screen which is the Kanban board and a set of modal dialogues for secondary actions (create, edit, delete confirmation, settings, and WIP error)(figure 1). This pattern reduces navigation complexity and keeps users anchored in the board context, which supports task management workflows and lowers cognitive load (Nielsen, 1994; Shneiderman et al., 2016).
+
+![figma-board](./docs/screenshots/day-2-figma.png "figma-designs")
+
+### 2.1 Prototype structure and interaction model
+The Kanban board is the main workspace and is organised into three columns: Backlog, In Progress, and Done. This supports the findings of modern research around recognition over recall by making state visible and reducing the need for users to remember where work “should be” (Nielsen, 1994) with the board acting as the source of truth. Task cards display the task title and task description, with action buttons on each card to reduce interaction effort.
+
+All secondary actions are implemented as pop up modals, which ensure users do not lose context or need to navigate away from the board (to other screens) to perform actions (Shneiderman et al., 2016). The modals are context-specific and appear only when needed, minimizing cognitive load. The Modals are as follows:
+- Create Task: opens the create modal from the “New Task” button.
+- Edit Task: opens the edit modal from the task's edit control.
+- Delete Task triggers a delete confirmation modal to prevent accidental destructive actions within the edit modal.
+- Settings opens a settings modal to modify the WIP limit.
+- WIP Limit Exceeded opens an error modal when the user attempts to move a task into In Progress and the WIP rule would be breached.
+
+This modal-based pattern provides clear interaction boundaries and supports safe task completion by reducing the number of screens the user must traverse (Nielsen, 1994). To ensure the interaction was well defined, prototyping was used in Figma to test the design layout (figure 2)
+
+![Figure 2: Figma prototype of the Kanban board with modals](./docs/videos/figma-prototype.gif)
+
+### 2.2 Key UX decisions and justification
+#### Three column structure for clarity and speed 
+The three column workflow has been designed intentionally to promiote interpretability and speed over configurability. For an MVP, this reduces teh effort required for onboarding/upskilling and therefore supports rapid adoption by aligning the interface with a familiar mental model of "to do / doing / done" (Shneiderman et al., 2016). The In Progress column explicitly displays the WIP limit, reinforcing the system’s primary behavioural goal.
+
+#### WIP limit enforcement 
+When a user attempts to move a task into "In Progress" and it exceeds the limit defined for that column, the prototype presents a dedicated “WIP Limit Exceeded” warning. This supports visibility of system status and error prevention by explaining why the action cannot be completed and what the user should do next through an eror message (complete a task before starting another) (Nielsen, 1994). Presenting this feedback immediately reduces ambiguity and discourages workarounds that would undermine flow discipline such as moving a task to backlog to start another.
+
+#### Task creation and editing
+The create and edit modals use a minimal set of fields (title required; description optional). This supports research into the area of project management that overly complex capture forms reduce compliance and increase the likelihood of informal “shadow tracking” outside the tool (Ries, 2011).
+
+#### Destructive action protection
+Deletion functionality is designed to be completed through a dedicated confirmation modal, reducing the risk of accidental data loss. This reflects a defensive design approach and supports error prevention principles (Shneiderman et al., 2016).
+
+#### Interaction choices (buttons vs drag-and-drop)
+Status/column transitions are designed as button actions rather than drag-and-drop. While drag-and-drop can feel intuitive, it is often harder to implement accessibly and reliably across devices without additional design and engineering effort. Button-based transitions provide clearer usability and can be labelled explicitly, the intial design of this project featured one button but future implementation led to 2 buttons (one right and one left), supporting accessibility expectations around operable interfaces and clear controls (W3C, 2023). This decision also reduces engineering risk within a short delivery window, while maintaining functional clarity.
+
+Overall, the prototype is minimal and designed to prove value and feasbility as it demonstrates the end-to-end user journey, makes the WIP constraint visible and enforceable, and keeps interaction cost low. This provides a strong harness for evaluating whether the WIP enforcement design achieves the desired behavioural outcome while remaining usable in delivery contexts (Anderson, 2010).
 ## 3. Project planning (Kanban board + tickets)
 ## 4. MVP implementation overview
 
@@ -186,4 +222,8 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 
 ## References
 - Anderson, D.J. (2010) *Kanban: Successful evolutionary change for your technology business*. Sequim, WA: Blue Hole Press.  
-- Beck, K. et al. (2001) *Manifesto for Agile Software Development*. Available at: https://agilemanifesto.org/
+- Beck, K. et al. (2001) *Manifesto for Agile Software Development*. Available at: https://agilemanifesto.org/ 
+- Nielsen, J. (1994) *Usability engineering*. San Francisco, CA: Morgan Kaufmann.  
+- Ries, E. (2011) *The Lean Startup: How today’s entrepreneurs use continuous innovation to create radically successful businesses*. New York: Crown Business.  
+- Shneiderman, B. et al. (2016) *Designing the user interface: Strategies for effective human-computer interaction*. 6th edn. Boston, MA: Pearson.  
+- W3C (2023) *Web Content Accessibility Guidelines (WCAG) 2.2*. Available at: https://www.w3.org/TR/WCAG22/
