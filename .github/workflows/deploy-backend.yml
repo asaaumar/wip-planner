@@ -3,7 +3,7 @@ name: Deploy Backend to OpenShift
 on:
   push:
     branches:
-      - ci/github-actions
+      - main
     paths:
       - 'backend/**'
       - '.github/workflows/deploy-backend.yml'

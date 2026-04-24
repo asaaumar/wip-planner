@@ -3,7 +3,7 @@ name: Deploy Frontend to OpenShift
 on:
   push:
     branches:
-      - ci/github-actions
+      - main
     paths:
       - 'frontend/**'
       - '.github/workflows/deploy-frontend.yml'
