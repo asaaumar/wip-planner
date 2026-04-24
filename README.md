@@ -122,7 +122,6 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - `PUT /settings/` - Update WIP limit
 
 ## 2. UX prototype (Figma)
-## 2. UX prototype (Figma)
 
 The UX prototype was designed to validate the core interaction model of the WIP Planner and is designed to allow users users to be able to: View work state through a single pane of glass, create and maintain tasks with minimal friction and effort and receive immediate, understandable feedback when attempting to exceed the Work-In-Progress (WIP) limit in line with the mvp scope and problem statement. The design uses a single primary screen which is the Kanban board and a set of modal dialogues for secondary actions (create, edit, delete confirmation, settings, and WIP error)(figure 1). This pattern reduces navigation complexity and keeps users anchored in the board context, which supports task management workflows and lowers cognitive load (Nielsen, 1994; Shneiderman et al., 2016).
 
@@ -143,8 +142,8 @@ This modal-based pattern provides clear interaction boundaries and supports safe
 ![Figure 2: Figma prototype of the Kanban board with modals](./docs/videos/figma-prototype.gif)
 
 ### 2.2 Key UX decisions and justification
-#### Three column structure for clarity and speed 
-The three column workflow has been designed intentionally to promiote interpretability and speed over configurability. For an MVP, this reduces teh effort required for onboarding/upskilling and therefore supports rapid adoption by aligning the interface with a familiar mental model of "to do / doing / done" (Shneiderman et al., 2016). The In Progress column explicitly displays the WIP limit, reinforcing the system’s primary behavioural goal.
+#### Three column structure
+The three column workflow has been designed intentionally to promiote interpretability and speed over configurability. For an MVP, this reduces the effort required for onboarding/upskilling and therefore supports rapid adoption by aligning the interface with a familiar mental model of "to do / doing / done" (Shneiderman et al., 2016). The In Progress column explicitly displays the WIP limit, reinforcing the system’s primary goal.
 
 #### WIP limit enforcement 
 When a user attempts to move a task into "In Progress" and it exceeds the limit defined for that column, the prototype presents a dedicated “WIP Limit Exceeded” warning. This supports visibility of system status and error prevention by explaining why the action cannot be completed and what the user should do next through an eror message (complete a task before starting another) (Nielsen, 1994). Presenting this feedback immediately reduces ambiguity and discourages workarounds that would undermine flow discipline such as moving a task to backlog to start another.
@@ -159,7 +158,28 @@ Deletion functionality is designed to be completed through a dedicated confirmat
 Status/column transitions are designed as button actions rather than drag-and-drop. While drag-and-drop can feel intuitive, it is often harder to implement accessibly and reliably across devices without additional design and engineering effort. Button-based transitions provide clearer usability and can be labelled explicitly, the intial design of this project featured one button but future implementation led to 2 buttons (one right and one left), supporting accessibility expectations around operable interfaces and clear controls (W3C, 2023). This decision also reduces engineering risk within a short delivery window, while maintaining functional clarity.
 
 Overall, the prototype is minimal and designed to prove value and feasbility as it demonstrates the end-to-end user journey, makes the WIP constraint visible and enforceable, and keeps interaction cost low. This provides a strong harness for evaluating whether the WIP enforcement design achieves the desired behavioural outcome while remaining usable in delivery contexts (Anderson, 2010).
+
 ## 3. Project planning (Kanban board + tickets)
+
+Project planning for the WIP Planner was managed using a Kanban-style workflow in GitHub Projects to support visibility and traceability. Kanban was selected as the project tasks are a set of small, testable work items (created as issues). The board functions as a planning tool and an execution tool.
+
+### 3.1 Board structure and workflow states
+The project board uses five columns: Backlog, Ready, In Progress, In Review, and Done.
+
+- Backlog contains tasks that are not yet ready to start.
+- Ready acts as a preparation zone for tasks that are ready to be worked on. This allows me to review and refine tasks before they enter development and plan what is to be done next.
+- In Progress contains tasks actively being implemented. Work is intentionally kept low in this column to reduce context switching and increase the probability that tasks reach a demonstrable “done” state within the timebox (Anderson, 2010). To match the short timeframe of this build related tickets were allowed to be in progress at once.  
+- In Review is used for work that is implemented but awaiting verification. This column was intended to be used for merge requests before they are merged to main however due to me being the only member of the team this was seen as redundant. 
+- Done represents work that is merged into `main` and completes the issue.
+
+### 3.2 Ticketing approach and traceability
+Work was deconstructued into small issues mapped to the MVP scope: backend persistence and CRUD, WIP settings, WIP enforcement on status transitions, frontend board UI and API integration testing, k8s, ci and docs.
+
+Execution evidence is captured through a PR-first workflow. Each feature was implemented on a branch and merged via a pull request linked to the relevant issue(s). PR descriptions include a summary of changes. This approach also supports the Agile tenat incremental integration which states smaller PRs reduce merge risk and make it easier to identify regressions compared with large changes (Beck et al., 2001).
+
+Links and evidence:
+- See [section 5](#5-pull-requests-and-workflow-evidence) for a list of PRs and evidence of the kanban board state associated with these PRs.
+
 ## 4. MVP implementation overview
 
 ### Build log
