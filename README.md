@@ -8,7 +8,7 @@
 ### 1.1 Problem statement
 Software delivery teams working in short, timeboxed cycles frequently encounter a predictable pattern: work is started quickly, but completion and validation lag behind. Under delivery pressure, teams may initiate multiple items in parallel to appear responsive, but this can be distracting and increase context switching. From a flow-based perspective, the result is often an accumulation of partially completed work in “in progress” states, while activities that prove completeness such as integration and end-to-end testing are deferred (Anderson, 2010). This creates a false positive of productivity which does not reflect the true completed tickets for the sprint. 
 
-High work-in-progress (WIP) is problematic because it hides bottlenecks and makes it harder to identify the true constraint in the system or team. When WIP is unconstrained and unmonitored, delays are not made visible as a  problem as they appear in progress and not blocked. This increases lead times and creates uneven delivery between sprints where tasks remain partially complete across multiple cycles and must be re assessed repeatedly (Anderson, 2010). Agile methods aim to reduce waste and deliver working increments frequently, but these outcomes depend on disciplined work management; without explicit flow controls, teams can inadvertently optimise for starting rather than finishing (Beck et al., 2001). In addition, teams often lack a mechanism to signal when “in progress” is saturated and should not be expanded further-especially in environments where external stakeholders have visibility of wip and there may be a pressure to appear busy.
+High work-in-progress (WIP) is problematic because it hides bottlenecks and makes it harder to identify the true constraint in the system or team. When WIP is unconstrained and unmonitored, delays are not made visible as a problem as they appear in progress and not blocked. This increases lead times and creates uneven delivery between sprints where tasks remain partially complete across multiple cycles and must be re assessed repeatedly (Anderson, 2010). Agile methods aim to reduce waste and deliver working increments frequently, but these outcomes depend on disciplined work management; without explicit flow controls, teams can inadvertently optimise for starting rather than finishing (Beck et al., 2001). In addition, teams often lack a mechanism to signal when “in progress” is saturated and should not be expanded further-especially in environments where external stakeholders have visibility of wip and there may be a pressure to appear busy.
 
 As mentioned above, this problem is amplified in client-facing or high-accountability contexts where delivery credibility depends not only on activity, but on demonstrable outcomes through playbacks. If work resource is spread too thin or an engineer is aligned to too many tickets due for completion, teams may miss opportunities to  demonstrate value, validate behaviour end-to-end (testing), and produce evidence that a feature is “done” in a meaningful sense in front of a client. Subsequently, stakeholders may request additional proof, rework, or changes late in the cycle, further increasing churn. A lightweight mechanism that improves flow discipline and makes constraints explicit can therefore support both delivery performance and stakeholder confidence.
 
@@ -258,10 +258,12 @@ The implementation of this project was delivered iteratively over a 1 week sprin
 
 #### Day 7 (Deployment yamls + OpenShift)
 - Wrote Kubernetes/OpenShift manifest YAMLs and deployed the final version to OpenShift.
-- [PR #41: k8s: added deployment manifests for front end, k8s: added deployment manifests for backend, fix: made changes to apps to work with eachother ink8s env](https://github.com/asaaumar/wip-planner/pull/41)
+- ![screenshot](docs/screenshots/running-pods.png)
 - Added CI through github actions to redploy on PR merge.
-- [PR #42: ci: add GitHub Actions workflows, test: trigger backend deployment, ci: changed files to watch main after testing](https://github.com/asaaumar/wip-planner/pull/42)
+- ![screenshot](docs/screenshots/actions-workflow.png)
 - Completed user and technical documentation (local run + deployment steps).
+- [PR #41: k8s: added deployment manifests for front end, k8s: added deployment manifests for backend, fix: made changes to apps to work with eachother ink8s env](https://github.com/asaaumar/wip-planner/pull/41)
+- [PR #42: ci: add GitHub Actions workflows, test: trigger backend deployment, ci: changed files to watch main after testing](https://github.com/asaaumar/wip-planner/pull/42)
 - ![screenshot](docs/screenshots/day-7-board.png)
 - ![screenshot](docs/screenshots/day-72-board.png)
 
@@ -342,7 +344,7 @@ Integration tests were written to ensure the WIP rule works correctly throughout
 Key Integration Test Scenarios:
 - Create a task and move it to in-progress successfully
 - Creates two tasks, moves first to in-progress, block second (409 response)
-- Verify WIP check only applies to in-progress transitions 
+- Verify WIP check only applies to in-progress transitions
 - Confirm moving back to backlog bypasses WIP check
 
 Example Integration Test:
@@ -378,8 +380,240 @@ The TDD approach provided several benefits:
 - Unit tests run fast, enabling rapid iteration (no need to spin up an instance and test)
 - Writing tests first led to a cleaner separation between business logic (WIP service) and infrastructure (API router, database)
 
+## 6. UI Implementation and Evaluation
+
+### 6.1 Accessibility and Usability Assessment
+
+The WIP Planner UI was implemented with accessibility and usability as core considerations, following WCAG 2.2 guidelines and established HCI principles.
+
+#### Visual Clarity and Perceivability
+The three-column layout provides visual separation between workflow states. Task cards use contrast and readable fonts, ensuring content is llegible for users with visual impairments.
+
+#### Error Feedback and Prevention
+When the WIP limit is exceeded, the application presents a modal pop with actionable error messaging: "WIP limit reached. Complete a task before starting another." This immediate feedback supports error prevention and recovery (Nielsen, 1994), helping users understand why their action was blocked and what to do next. The error modal requires dismissal, ensuring users acknowledge the constraint before continuing.
+
+#### Modal-Based Interaction Pattern
+Secondary actions (create, edit, delete, settings) use modal dialogs that maintain context by keeping the board visible in the background. This reduces cognitive load by eliminating navigation between screens to understand context. However, pop ups can present accessibility challenges if not implemented correctly and future work should verify screen reader compatibility.
+
+#### Usability Strengths
+The UI successfully delivers on its core goal: making WIP limits enforceable and visible. The minimal design reduces learning time, and the button-based interactions are predictable and consistent. Task creation requires only a title, encouraging adoption.
+
+#### Identified Limitations
+The current implementation has no visual indication of keyboard focus states (highlighted task) beyond browser defaults, which could be enhanced with custom focus styling. Additionally, the application does not support responsive design for mobile devices, limiting accessibility for users on smaller screens.
+
+### 6.2 Future Work
+
+Accessibility Enhancements
+- Implement custom focus indicators with high-contrast styling
+- Add keyboard shortcuts for common actions (e.g. "N" for new task, "?" for help)
+- Conduct formal accessibility testing
+- Implement responsive design for mobile devices
+
+Usability Improvements
+- Add task filtering and search functionality for larger backlogs
+- Implement task prioritization within backlog (drag-to-reorder)
+- Add visual indicators for tasks that have been "in progress" for extended periods
+- Provide undo/redo functionality for accidental actions
+
+Feature Extensions
+- Support for multiple boards or projects
+- Task assignment and collaboration features for team use
+- Integration with external tools (Jira, GitHub Issues, Slack)
+- Analytics dashboard showing cycle time, throughput, and WIP trends over time
+- Configurable workflow states beyond the three-column MVP
+
+Technical Improvements
+- Add end-to-end tests using Playwright or Cypress
+- Implement frontend unit tests for React components
+- Migrate from SQLite to PostgreSQL for production scalability
+- Implement authentication for SaaS deployment
+
+These enhancements would transform the MVP into a production-ready tool suitable for broader adoption while maintaining the core principle of enforced WIP limits.
+
 ## How to run locally
+
+The WIP Planner consists of two services: a FastAPI backend and a React frontend. Both need to be running for the full application to work.
+
+### Prerequisites
+
+- Backend: Python 3.8+ and pip
+- Frontend: Node.js (v14+) and npm
+- Optional: Docker for containerized deployment
+
+### Running the Backend
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Create and activate a virtual environment:
+   
+   On macOS/Linux:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+   
+   On Windows:
+   ```bash
+   python3 -m venv venv
+   venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Run the backend server:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+   
+   The API will be available at `http://localhost:8000`
+   
+   - Interactive API docs: `http://localhost:8000/docs`
+   - Health check: `http://localhost:8000/health`
+
+### Running the Frontend
+
+1. Open a new terminal and navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+   
+   The application will automatically open at `http://localhost:3000`
+
+### Verify the Application
+
+1. The frontend should load in your browser at `http://localhost:3000`
+2. Create a new task using the "New Task" button
+3. Try moving a task to "In Progress" - it should succeed
+4. Try moving a second task to "In Progress" - you should see the WIP limit error
+5. Adjust the WIP limit in Settings to test different configurations
+
+### Running Tests
+
+To run the backend test suite:
+
+```bash
+cd backend
+pytest -v                                   # All tests
+pytest tests/test_wip_limit.py -v          # Unit tests only
+pytest tests/test_wip_enforcement.py -v    # Integration tests only
+```
+
 ## Deployment
+
+The WIP Planner is deployed to OpenShift on IBM Cloud with automated CI/CD via GitHub Actions.
+
+### Automated Deployment (GitHub Actions)
+
+The project uses GitHub Actions for continuous deployment. When changes are pushed to the `main` branch:
+
+1. Backend changes (in `backend/` directory) trigger `.github/workflows/deploy-backend.yml`
+   - Builds a new Docker image on OpenShift
+   - Deploys to the `asaa-test` project
+   - Performs a rolling update with zero downtime
+
+2. Frontend changes (in `frontend/` directory) trigger `.github/workflows/deploy-frontend.yml`
+   - Builds a new Docker image with the backend URL baked in
+   - Deploys to the `asaa-test` project
+   - Performs a rolling update with zero downtime
+   - ![actions-workflow](./docs/screenshots/actions-workflow.png)
+  
+
+Required GitHub Secrets:
+- `OPENSHIFT_SERVER` - OpenShift cluster API endpoint
+- `OPENSHIFT_TOKEN` - Authentication token for OpenShift CLI
+- `BACKEND_URL` - Backend API URL for frontend build
+- ![actions-secret](./docs/screenshots/actions-secret.png)
+
+### Manual Deployment to OpenShift
+
+If you need to deploy manually:
+
+#### 1. Login to OpenShift
+
+```bash
+oc login --token=<your-token> --server=<your-server>
+oc project asaa-test
+```
+
+#### 2. Deploy Backend
+
+```bash
+cd backend
+
+# Create build configuration 
+oc new-build . --name=wip-planner-backend --strategy=docker
+
+# Build and deploy
+oc start-build wip-planner-backend --from-dir=. --follow
+
+# Apply Kubernetes manifests 
+oc apply -f ../k8s/backend/
+
+# Restart deployment to use new image
+oc rollout restart deployment/wip-planner-backend
+```
+
+#### 3. Deploy Frontend
+
+```bash
+cd frontend
+
+# Get backend URL
+BACKEND_URL=$(oc get route wip-planner-backend -o jsonpath='{.spec.host}')
+
+# Create build configuration 
+oc new-build . --name=wip-planner-frontend --strategy=docker
+
+# Build with backend URL and deploy
+oc start-build wip-planner-frontend \
+  --from-dir=. \
+  --build-arg REACT_APP_API_URL=https://$BACKEND_URL \
+  --follow
+
+# Apply Kubernetes manifests
+oc apply -f ../k8s/frontend/
+
+# Restart deployment to use new image
+oc rollout restart deployment/wip-planner-frontend
+```
+
+#### 4. Verify Deployment
+
+```bash
+# Check pod status
+oc get pods
+
+# Check routes
+oc get routes
+
+# View logs
+oc logs -f deployment/wip-planner-backend
+oc logs -f deployment/wip-planner-frontend
+```
+
+### Deployment Architecture
+
+- Backend: 2 replicas, SQLite database on persistent volume (1Gi PVC)
+- Frontend: 2 replicas, nginx serving static React build
+- Networking: HTTPS routes with TLS edge termination
+- CORS: Backend configured to accept requests from frontend URL
+- Health checks: Liveness and readiness probes configured
 
 ## References
 - Anderson, D.J. (2010) *Kanban: Successful evolutionary change for your technology business*. Sequim, WA: Blue Hole Press.  
