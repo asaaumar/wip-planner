@@ -178,54 +178,92 @@ Work was deconstructued into small issues mapped to the MVP scope: backend persi
 Execution evidence is captured through a PR-first workflow. Each feature was implemented on a branch and merged via a pull request linked to the relevant issue(s). PR descriptions include a summary of changes. This approach also supports the Agile tenat incremental integration which states smaller PRs reduce merge risk and make it easier to identify regressions compared with large changes (Beck et al., 2001).
 
 Links and evidence:
-- See [section 5](#5-pull-requests-and-workflow-evidence) for a list of PRs and evidence of the kanban board state associated with these PRs.
+- See [section 4](#4-mvp-implementation-overview) for a list of features, PRs and evidence of the kanban board state associated with these PRs.
 
 ## 4. MVP implementation overview
 
-### Build log
+### Build log (academic implementation narrative)
 
-#### Day 1 (Setup & scaffolding)**
-- Created repository structure for `backend/`, `frontend/`, `docs/`, `k8s/`.
-- Bootstrapped the backend with a FastAPI skeleton and a `/health` endpoint for smoke-checking the API.
-- Bootstrapped the frontend using a vanilla JavaScript template to establish the UI build.
-- Added the README structure aligned to the assessment deliverables and documented the MVP statement.
-- Set up the GitHub Project board (Kanban) and created initial issues/milestones to track MVP, testing, CI/CD, and deployment work.
+The implementation of this project was delivered iteratively over a 1 week sprint. The following log captures the tangible outcomes of each day:
 
-#### Day 2 (Proposal, UX prototype, and API contract)**
-- Documented the product proposal (problem, target users, MVP features, and non-goals) in the root README.
-- Created a clickable UX prototype (Figma) covering the main screens: board, create/edit task, settings (WIP limit), and error state.
-- Defined the MVP API contract (tasks + settings endpoints) including the expected WIP limit error response (409 conflict with a clear message).
-- Added UX screenshots to `docs/screenshots/` and a UX video in `docs/videos/` for later use in the README.
-
-#### Day 3 (Backend persistence and CRUD)**
-- Implemented SQLite persistence and added a Task data model to support stored tasks across sessions.
-- Added backend CRUD endpoints for tasks (create/list/update/delete) and verified behaviour using FastAPI interactive docs.
-- Captured evidence for documentation (FastAPI `/docs` screenshot showing task endpoints) and updated build log
-- Added settings endpoints to get and put wip limit settings and defined associated model
-- Added a test harness and simple test to setup for tdd work
- 
-#### Day 4 (WIP with TDD)**
-- Added PATCH status endpoint with WIP enforcement and 409 error
-- Added unit-tested WIP rule via TDD
-
-#### Day 5 (Wed 22 Apr):**
-- Implemented frontend Kanban board UI (3 columns).
-- Connected frontend to backend API (load tasks + create tasks).
-- Added status transition buttons and UI handling for WIP limit errors (409).
-- Added settings to allow users to set WIP limit.
-  
-## 5. Pull requests and workflow evidence
+#### Day 1 (Setup & scaffolding)
+- Created repo structure (`backend/`, `frontend/`, `docs/`, `k8s/`) and initial README headings for traceability.
+- Bootstrapped FastAPI with `/health` for smoke checks and early verification.
+- Bootstrapped frontend (react JS)
+![frontend-basic](docs/screenshots/front-end-basic.png)
+- Created GitHub Projects board and initial issues to track delivery.
 - [PR #15: chore: day 1 scaffold backend/frontend and README](https://github.com/asaaumar/wip-planner/pull/15)
+- Kanban board state: 
+- ![screenshot](docs/screenshots/day-1-board.png)
+
+#### Day 2 (UX prototype & API Contract)
+- Produced a clickable Figma prototype using a single-board view with pop up modals (create/edit/delete/settings/WIP error).
+- Defined the MVP API contract (tasks + settings endpoints)
+- Figma evidence in: screenshots (`docs/screenshots/`) and prototype video (`docs/videos/`).
+- [PR #19: feature: add SQLite persistence and task model](https://github.com/asaaumar/wip-planner/pull/19)
+- Kanban board state: 
+- ![screenshot](docs/screenshots/day-2-board.png)
+
+#### Day 3 (Backend persistence + CRUD + test harness)
+- Implemented SQLite persistence and Task model to store tasks across sessions.
+- Added CRUD endpoints: `GET/POST/PUT/DELETE /tasks` and verified via FastAPI interactive docs.
+![CRUD endpoints](docs/screenshots/task-crud-endpoints.png)
+- Added `GET/PUT /settings` for WIP limit configuration.
+![Settings Get](docs/screenshots/settings-get.png)
+![Settings Get](docs/screenshots/settings-put.png)
+- Added pytest harness + initial smoke test to support tdd work.
 - [PR #19: feature: add SQLite persistence and task model](https://github.com/asaaumar/wip-planner/pull/19)
 - [PR #20: feature: implement task CRUD endpoints](https://github.com/asaaumar/wip-planner/pull/20)
 - [PR #21: Feature: added get specific task endpoint](https://github.com/asaaumar/wip-planner/pull/21)
 - [PR #23: feature: add settings endpoints for WIP limit](https://github.com/asaaumar/wip-planner/pull/23)
 - [PR #24: test: add pytest scaffold and health endpoint test](https://github.com/asaaumar/wip-planner/pull/24)
+- Kanban board state: 
+- ![screenshot](docs/screenshots/day-3-board.png)
+
+
+#### Day 4 (WIP rule + status transitions with TDD)
+- Added `PATCH /tasks/{id}/status`.
+- ![endpoint-screenshot](docs/screenshots/day-4-endpoints.png)
+- Implemented WIP enforcement when moving to `IN_PROGRESS`; returns `409` with structured error when limit exceeded.
+![patch-status-screenshot](docs/screenshots/patch-success.png)
+![patch-409-screenshot](docs/screenshots/patch-409.png)
+- Added unit tests using a TDD sequence (write test, watch test fail, write code to pass test, watch test pass) for the WIP rule enforcement.
 - [PR #26: test: add failing tests for WIP rule (TDD), feat: implement WIP rule to satisfy tests](https://github.com/asaaumar/wip-planner/pull/26)
 - [PR #27: test: written tests for checking wip limit when changing status, feature: added patch endpoint to change status,wrote code to pass wip enforcement tests](https://github.com/asaaumar/wip-planner/pull/27)
-- [PR #32:f eature: add frontend kanban board layout](https://github.com/asaaumar/wip-planner/pull/32)
+- Kanban board state: 
+- ![screenshot](docs/screenshots/day-4-board.png)
+
+#### Day 5 (Frontend integration + error UX + containerisation)
+- Implemented 3-column Kanban UI and connected to backend (load + create tasks).
+- ![frontend-with-tickets](docs/screenshots/frontend-with-tickets.png)
+-![frontend-create-task](docs/screenshots/frontend-create-task.png)
+- Added button-based status transitions and UI handling for `409 WIP_LIMIT_EXCEEDED` responses.
+![frontend-wip-enforcement-warning](docs/screenshots/frontend-wip-enforcement-warning.png)
+- Added settings modal to update WIP limit via `/settings`.
+![frontend-settings](docs/screenshots/frontend-settings.png)
+![front-end-2wip](docs/screenshots/front-end-2wip.png)
+- Added edit task modal
+![frontend-edit](docs/screenshots/frontend-edit.png)
+- Added Dockerfiles for backend and frontend to enable reproducible builds and deployment.
+- [PR #32:feature: add frontend kanban board layout](https://github.com/asaaumar/wip-planner/pull/32)
 - [PR #33: feature: connect frontend to backend (load and create tasks) with WIP enforcement](https://github.com/asaaumar/wip-planner/pull/33)
 - [PR #35: feature: added settings modal to change WIP](https://github.com/asaaumar/wip-planner/pull/35)
+- [PR #36: k8s: added Dockerfile and dockerignore](https://github.com/asaaumar/wip-planner/pull/36)
+- ![screenshot](docs/screenshots/day-5-board.png)
+- ![screenshot](docs/screenshots/day-52-board.png)
+- ![screenshot](docs/screenshots/day-53-board.png)
+
+#### Day 6 (Documentation)
+- Expanded README sections to document UX decisions, API contract, implemented features, and evidence (PRs, screenshots).
+
+#### Day 7 (Deployment yamls + OpenShift)
+- Wrote Kubernetes/OpenShift manifest YAMLs and deployed the final version to OpenShift.
+- [PR #41: k8s: added deployment manifests for front end, k8s: added deployment manifests for backend, fix: made changes to apps to work with eachother ink8s env](https://github.com/asaaumar/wip-planner/pull/41)
+- Added CI through github actions to redploy on PR merge.
+- [PR #42: ci: add GitHub Actions workflows, test: trigger backend deployment, ci: changed files to watch main after testing](https://github.com/asaaumar/wip-planner/pull/42)
+- Completed user and technical documentation (local run + deployment steps).
+- ![screenshot](docs/screenshots/day-7-board.png)
+- ![screenshot](docs/screenshots/day-72-board.png)
 
 
 ## 6. UI implementation notes
