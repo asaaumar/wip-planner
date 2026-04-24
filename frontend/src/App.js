@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const API_BASE_URL = 'http://localhost:8000';
+// Get API URL from environment variable or use default for local development
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+console.log('API Base URL:', API_BASE_URL);
 
 function Modal({ isOpen, onClose, children }) {
   if (!isOpen) return null;
