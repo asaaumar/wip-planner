@@ -1,0 +1,61 @@
+name: Deploy Backend to OpenShift
+
+on:
+  push:
+    branches:
+      - ci/github-actions
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Install OpenShift CLI
+      run: |
+        wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+        tar -xzf openshift-client-linux.tar.gz
+        sudo mv oc /usr/local/bin/
+        sudo chmod +x /usr/local/bin/oc
+        oc version
+    
+    - name: Login to OpenShift
+      env:
+        OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
+        OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+      run: |
+        oc login --token=$OPENSHIFT_TOKEN --server=$OPENSHIFT_SERVER --insecure-skip-tls-verify
+        oc project asaa-test
+    
+    - name: Build and Deploy Backend
+      run: |
+        cd backend
+        
+        # Check if BuildConfig exists, create if not
+        if ! oc get bc/wip-planner-backend &> /dev/null; then
+          echo "Creating BuildConfig..."
+          oc new-build . --name=wip-planner-backend --strategy=docker
+        fi
+        
+        # Start build from current directory
+        oc start-build wip-planner-backend --from-dir=. --follow
+        
+        # Restart deployment to use new image
+        oc rollout restart deployment/wip-planner-backend
+        
+        # Wait for rollout to complete
+        oc rollout status deployment/wip-planner-backend --timeout=5m
+    
+    - name: Verify Deployment
+      run: |
+        echo "Backend deployment completed!"
+        oc get pods -l app=wip-planner-backend
+        BACKEND_URL=$(oc get route wip-planner-backend -o jsonpath='{.spec.host}')
+        echo "Backend URL: https://$BACKEND_URL"
+
+
