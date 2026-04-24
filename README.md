@@ -87,7 +87,7 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 }
 ```
 
-**Example Error Response:**
+Example Error Response:
 ```json
 {
   "error": {
@@ -109,7 +109,7 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 
 #### REST API Endpoints
 
-**Task Endpoints:**
+Task Endpoints:
 - `GET /tasks` - List all tasks
 - `POST /tasks` - Create a new task
 - `GET /tasks/{id}` - Get a specific task
@@ -117,7 +117,7 @@ All API errors return a consistent format that maps to UI error toasts/modals:
 - `DELETE /tasks/{id}` - Delete a task
 - `PATCH /tasks/{id}/status` - Update task status (with WIP limit enforcement)
 
-**Settings Endpoints:**
+Settings Endpoints:
 - `GET /settings/` - Get current WIP limit settings
 - `PUT /settings/` - Update WIP limit
 
@@ -265,15 +265,118 @@ The implementation of this project was delivered iteratively over a 1 week sprin
 - ![screenshot](docs/screenshots/day-7-board.png)
 - ![screenshot](docs/screenshots/day-72-board.png)
 
+## 5. TDD Example: WIP Limit Enforcement
 
-## 6. UI implementation notes
-## 7. Testing + accessibility evidence
+Test-Driven Development (TDD) was used to implement the WIP limit enforcement logic. This section describes the TDD cycle used to build the `can_move_to_in_progress` function, which determines whether a task can be moved to "In Progress" based on the WIP limit.
 
-- Pytest scaffold added: health check and init tests passing.
+### 5.1 TDD Approach and Rationale
 
-## 8. TDD example
-## 9. CI/CD + production deployment (Kubernetes)
-## 10. User guide + technical documentation
+TDD was selected for the WIP enforcement feature because:
+- The WIP rule has well-defined inputs (current count, limit) and outputs (allow/block)
+- WIP enforcement is the primary goal for the project
+- Multiple boundary conditions needed explicit testing (at limit, below limit, zero limit)
+
+The TDD cycle followed Red-Green-Refactor pattern:
+- Red: Write a failing test that defines desired behaviour
+-Green: Write minimal code to make the test pass
+- Refactor: Improve code quality while keeping tests green
+
+### 5.2 Test Suite: Unit Tests for WIP Logic
+
+The unit tests focus on the pure business logic in isolation, testing the `can_move_to_in_progress` function with various inputs:
+
+Test Cases:
+- Allow when count < limit - Verifies tasks can move when under capacity (0 < 1)
+- Allow when just below limit - Tests boundary condition (2 < 3)
+- Block when count == limit - Enforces limit at exact capacity (1 == 1)
+- Block when count > limit - Handles over-capacity scenarios (3 > 2)
+- Block when limit is zero - Edge case: no tasks allowed (0 >= 0)
+- Block with zero limit and positive count - Validates zero limit blocks all (5 >= 0)
+
+Each test follows the Arrange-Act-Assert pattern.
+
+Example Test (Red Phase):
+```python
+def test_block_when_count_equals_limit(self):
+    """Should block moving to in-progress when count == limit"""
+    # Arrange
+    in_progress_count = 1
+    wip_limit = 1
+    
+    # Act
+    result = can_move_to_in_progress(in_progress_count, wip_limit)
+    
+    # Assert
+    assert result is False, "Should block when count (1) == limit (1)"
+```
+
+### 5.3 Implementation: WIP Service (Green Phase)
+
+After writing failing tests, the minimal implementation was created in `app/services/wip.py`:
+
+```python
+def can_move_to_in_progress(in_progress_count: int, wip_limit: int) -> bool:
+    """
+    Check if a task can be moved to in-progress status
+    
+    Args:
+        in_progress_count: Current number of tasks in progress
+        wip_limit: Maximum allowed tasks in progress
+        
+    Returns:
+        True if task can be moved to in-progress, False otherwise
+    """
+    return in_progress_count < wip_limit
+```
+
+This implementation satisfies all test cases.
+
+### 5.4 Integration Tests: End-to-End WIP Enforcement
+
+Integration tests were written to ensure the WIP rule works correctly throughout the backend, including:
+- Database interactions
+- HTTP request/response handling
+- Status transitions via the `PATCH /tasks/{id}/status` endpoint
+- Error responses (409 Conflict) when WIP limit is exceeded
+
+Key Integration Test Scenarios:
+- Create a task and move it to in-progress successfully
+- Creates two tasks, moves first to in-progress, block second (409 response)
+- Verify WIP check only applies to in-progress transitions 
+- Confirm moving back to backlog bypasses WIP check
+
+Example Integration Test:
+```python
+def test_blocks_moving_to_in_progress_when_at_limit():
+    """Should block moving to in-progress when at WIP limit"""
+    # Create two tasks
+    response1 = client.post("/tasks/", json={"title": "Task 1"})
+    task1_id = response1.json()["id"]
+    
+    response2 = client.post("/tasks/", json={"title": "Task 2"})
+    task2_id = response2.json()["id"]
+    
+    # Move first task to in-progress (should succeed)
+    response = client.patch(f"/tasks/{task1_id}/status",
+                           json={"status": "in-progress"})
+    assert response.status_code == 200
+    
+    # Try to move second task to in-progress (should fail, 1 >= 1)
+    response = client.patch(f"/tasks/{task2_id}/status",
+                           json={"status": "in-progress"})
+    assert response.status_code == 409
+    assert "WIP_LIMIT_REACHED" in str(response.json())
+```
+
+### 5.5 TDD Benefits
+
+The TDD approach provided several benefits:
+
+- All edge cases are explicitly tested, reducing the risk of bugs in production
+- Tests document the expected behaviour of the WIP rule for future development
+- The test suite allows for refactoring without breaking functionality
+- Unit tests run fast, enabling rapid iteration (no need to spin up an instance and test)
+- Writing tests first led to a cleaner separation between business logic (WIP service) and infrastructure (API router, database)
 
 ## How to run locally
 ## Deployment
