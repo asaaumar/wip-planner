@@ -2,6 +2,7 @@
 WIP Planner Backend API
 A FastAPI application for managing Kanban boards with WIP limits.
 """
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -18,14 +19,28 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# Configure CORS
+# Get frontend URL from environment variable
+FRONTEND_URL = os.getenv(
+    "FRONTEND_URL",
+    "http://localhost:3000"  # Default for local development
+)
+
+# Configure CORS with environment variable
+allowed_origins = [FRONTEND_URL]
+
+# Also allow localhost for development
+if "localhost" not in FRONTEND_URL:
+    allowed_origins.append("http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+print(f"CORS configured for origins: {allowed_origins}")
 
 # Include routers
 app.include_router(tasks.router)
